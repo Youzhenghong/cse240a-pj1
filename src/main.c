@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "predictor.h"
 
 FILE *stream;
@@ -80,6 +81,10 @@ read_branch(uint32_t *pc, uint8_t *outcome)
 int
 main(int argc, char *argv[])
 {
+  
+
+
+
   // Set defaults
   stream = stdin;
   bpType = STATIC;
@@ -110,6 +115,10 @@ main(int argc, char *argv[])
   uint32_t pc = 0;
   uint8_t outcome = NOTTAKEN;
 
+  //run_tests
+  run_tests();
+
+
   // Reach each branch from the trace
   while (read_branch(&pc, &outcome)) {
     num_branches++;
@@ -139,3 +148,5 @@ main(int argc, char *argv[])
 
   return 0;
 }
+
+

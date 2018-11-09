@@ -48,8 +48,19 @@ extern int bpType;       // Branch Prediction Type
 extern int verbose;
 
 //------------------------------------//
+//    ISA Attributes   //
+//------------------------------------//
+#define INST_SIZE 64
+
+//------------------------------------//
 //    Predictor Function Prototypes   //
 //------------------------------------//
+
+
+void shift_pattern_reg(bool taken, int* pattern_reg);
+void not_taken_shift(int* pattern_reg);
+void taken_shift(int* pattern_reg);
+void run_tests();
 
 // Initialize the predictor
 //

@@ -6,14 +6,16 @@
 //  described in the README                               //
 //========================================================//
 #include <stdio.h>
+#include <stdbool.h>
+#include <math.h>
 #include "predictor.h"
 
 //
 // TODO:Student Information
 //
-const char *studentName = "NAME";
-const char *studentID   = "PID";
-const char *email       = "EMAIL";
+const char *studentName = "Zhenghong You";
+const char *studentID   = "A53252773";
+const char *email       = "yzhengho@eng.ucsd.edu";
 
 //------------------------------------//
 //      Predictor Configuration       //
@@ -36,11 +38,22 @@ int verbose;
 //
 //TODO: Add your own Branch Predictor data structures here
 //
-
+int global_hist_reg;
+int local_hist_reg;
+int GLOBAL_T_MASK;
 
 //------------------------------------//
 //        Predictor Functions         //
 //------------------------------------//
+
+/*
+ T         N
+0000  -> 1000 -> 0100
+1000  -> 0000
+
+
+*/
+
 
 // Initialize the predictor
 //
@@ -50,7 +63,39 @@ init_predictor()
   //
   //TODO: Initialize Branch Predictor Data Structures
   //
+    GLOBAL_T_MASK = 1 << (ghistoryBits - 1);
+    global_hist_reg = 0;
+    local_hist_reg = 0;
 }
+
+
+int BHT_Index(int pc, int global_hist_reg, int shift) {
+
+     int mask = (int)pow(2, shift) - 1;
+     return (pc ^ global_hist_reg) & mask;
+}
+
+void shift_pattern_reg(bool taken, int* pattern_reg) {
+    if (taken) {
+      taken_shift(pattern_reg);
+    } else {
+      not_taken_shift(pattern_reg);
+    }
+}
+
+void not_taken_shift(int* pattern_reg) {
+    *pattern_reg = (*pattern_reg >> 1);
+}
+
+void taken_shift(int* pattern_reg) {
+    *pattern_reg = (*pattern_reg >> 1) | GLOBAL_T_MASK;
+}
+
+
+
+
+
+
 
 // Make a prediction for conditional branch instruction at PC 'pc'
 // Returning TAKEN indicates a prediction of taken; returning NOTTAKEN
