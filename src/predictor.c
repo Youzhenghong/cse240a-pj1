@@ -16,6 +16,10 @@
 const char *studentName = "Zhenghong You";
 const char *studentID   = "A53252773";
 const char *email       = "yzhengho@eng.ucsd.edu";
+// global functions
+int read_branch(uint32_t *pc, uint8_t *outcome);
+
+
 
 //------------------------------------//
 //      Predictor Configuration       //
@@ -41,7 +45,7 @@ int verbose;
 int global_hist_reg;
 int local_hist_reg;
 int GLOBAL_T_MASK;
-
+uint8_t bht[BHT_SIZE];
 //------------------------------------//
 //        Predictor Functions         //
 //------------------------------------//
@@ -66,6 +70,11 @@ init_predictor()
     GLOBAL_T_MASK = 1 << (ghistoryBits - 1);
     global_hist_reg = 0;
     local_hist_reg = 0;
+    
+    for (int i = 0; i < BHT_SIZE; i++) {
+        bht[i] = SN;
+    }
+
 }
 
 
@@ -91,9 +100,36 @@ void taken_shift(int* pattern_reg) {
     *pattern_reg = (*pattern_reg >> 1) | GLOBAL_T_MASK;
 }
 
+uint8_t bhtLookUpHelper(uint8_t flag) {
+    if (flag < 2) {
+        return NOTTAKEN;
+    } else {
+        return TAKEN;
+    }
+}
 
+void updateBHT(int index, bool flag) {
+    if (flag) {
+        bht[index] = MIN(3, bht[index] + 1);
+    } else {
+        bht[index] = MAX(0, bht[index] - 1);
+    }
+}
+//gshare prediction
+uint8_t 
+gSharePredict(uint32_t pc) {
+    int BHTAddress = BHT_Index(pc, global_hist_reg, ghistoryBits);
+    uint8_t pred = bhtLookUpHelper(bht[BHTAddress]);
+    uint8_t outcome = NOTTAKEN;
+    read_branch(&pc, &outcome);
 
-
+    if (outcome == pred) {
+        updateBHT(BHTAddress, true);
+    } else {
+        updateBHT(BHTAddress, false);
+    }
+    return pred;
+}
 
 
 
@@ -113,6 +149,7 @@ make_prediction(uint32_t pc)
     case STATIC:
       return TAKEN;
     case GSHARE:
+      return gSharePredict(pc);
     case TOURNAMENT:
     case CUSTOM:
     default:

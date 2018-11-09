@@ -116,7 +116,7 @@ main(int argc, char *argv[])
   uint8_t outcome = NOTTAKEN;
 
   //run_tests
-  run_tests();
+  //run_tests();
 
 
   // Reach each branch from the trace

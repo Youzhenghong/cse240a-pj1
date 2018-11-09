@@ -51,7 +51,9 @@ extern int verbose;
 //    ISA Attributes   //
 //------------------------------------//
 #define INST_SIZE 64
-
+#define BHT_SIZE 65536
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
 //------------------------------------//
 //    Predictor Function Prototypes   //
 //------------------------------------//
